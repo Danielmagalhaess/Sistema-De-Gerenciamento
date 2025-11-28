@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursos Cadastrados - SGFIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/cursoHome.css">
+
+
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- NAV LATERAL -->
+    <nav id="side-nav">
+        <div id="side-nav-container" class="flex flex-col">
+            <div class="flex items-center gap-4 mb-8 ml-2 h-10">
+                <i class="fa-solid fa-layer-group text-3xl text-blue-400"></i>
+                <span class="nav-link-text font-bold text-xl">SGFIC</span>
+            </div>
+            <ul class="flex flex-col gap-2">
+                <li>
+                    <a href="/home" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-house"></i>
+                        <span class="nav-link-text font-semibold">Home</span></a>
+                </li>
+                <li>
+                    <a href="/feriados" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-calendar-alt"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Feriados</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/docentes" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Docentes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/usuarios" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-user"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Usuários</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/cursos" class="nav-link bg-gray-700 text-gray-300 text-white">
+                        <i class="fas fa-book"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Cursos</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="logout-container">
+            <a href="/logout" class="logout-btn bg-red-900 text-white hover:bg-red-800 w-full">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="nav-link-text font-semibold">Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <i class="fas fa-book text-blue-600"></i>
+                    Cursos Cadastrados
+                </h1>
+                <p class="text-gray-500 mt-1">Gerencie os cursos e suas informações acadêmicas.</p>
+            </div>
+            <!-- Redirecionamento para cursoCreate -->
+            <form action="/curso/criar">
+                <button id="btnCreateCurso"
+                    class="mt-4 sm:mt-0 flex items-center justify-center bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300">
+                    <i class="fa-solid fa-plus mr-2"></i> Cadastrar Curso
+                </button>
+            </form>
+        </header>
+
+        <!-- Filtro e Busca -->
+        <div class="mb-6">
+            <div class="flex flex-row gap-4 items-center">
+                <div class="relative w-full max-w-md">
+                    <input id="input-busca" type="text" placeholder="Pesquisar curso..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="w-full max-w-xs">
+                    <select id="select-filtro-area"
+                        class="w-25 sm:w-auto h-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="todos">Selecione o nível</option>
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELA -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                        <tr class="border-b border-gray-200">
+                            <th class="px-6 py-4 text-left"><i class="fas fa-book-open mr-2"></i> Nome do Curso</th>
+                            <th class="px-6 py-4 text-left"><i class="fas fa-info-circle mr-2"></i> Status</th>
+                            <th class="px-6 py-4 text-center"><i class="fas fa-cogs mr-2"></i> Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (cursos.length === 0) { %>
+                            <tr class="border-t">
+                                <td colspan="4" class="text-center py-16 text-gray-500">
+                                    Nenhum curso encontrado
+                                </td>
+                            </tr>
+                        <% } else { %>
+                            <% cursos.forEach(curso => { %>
+                                <tr class="border-b border-gray-200">
+                                    <!-- Nome do Curso -->
+                                    <td class="px-6 py-4 font-medium text-gray-900">
+                                        <i class="fas fa-book mr-2"></i>
+                                        <%= curso.nome_curso %>
+                                    </td>
+                    
+                                    <!-- Status -->
+                                    <% const statusMap = { ativo: 'Ativo', inativo: 'Inativo', encerrado: 'Encerrado' }; %>
+                                    <td class="px-6 py-4">
+                                        <span class="status-badge 
+                                            <%= curso.status === 'ativo' ? 'status-ativo' : 
+                                                curso.status === 'inativo' ? 'status-inativo' : 
+                                                'status-licenca' %>">
+                                            <%= statusMap[curso.status] %>
+                                        </span>
+                                    </td>
+                    
+                                    <!-- Ações -->
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex items-center justify-center gap-4">
+                                            <a href="/curso/nome/edit/<%= curso.id_nome_curso %>" class="text-gray-500 hover:text-blue-600">
+                                                <i class="fa-solid fa-pencil"></i>
+                                            </a>
+                                            <button type="button"
+                                                class="text-gray-500 hover:text-red-600 delete-btn"
+                                                data-id="<%= curso.id_nome_curso %>"
+                                                data-nome="<%= curso.nome_curso %>">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } %>
+                    </tbody>                    
+                </table>
+
+                <!-- Paginação -->
+                <div class="pagination-container">
+                    <div class="text-sm text-gray-600" id="pagination-info-text">Mostrando 1–10 de 50 cursos</div>
+                    <div class="flex items-center gap-3">
+                        <button id="prev-btn" class="pagination-btn" disabled><i
+                                class="fas fa-chevron-left"></i>Anterior</button>
+                        <div id="page-numbers" class="flex gap-1"></div>
+                        <button id="next-btn" class="pagination-btn">Próxima<i
+                                class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">Itens por página:</span>
+                        <select id="items-per-page" class="border rounded px-2 py-1 text-sm">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Deleção -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle text-red-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900">Confirmar Exclusão</h3>
+            </div>
+            <button type="button" id="closeModal" class="text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <p class="text-gray-600 mb-4">Tem certeza que deseja excluir o curso <strong id="cursoNome"></strong>?</p>
+            <p class="text-sm text-gray-500 mb-6">Esta ação não pode ser desfeita.</p>
+            <div class="flex justify-end gap-3">
+            <button type="button" id="cancelDelete"
+                class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                Cancelar
+            </button>
+            <button type="button" id="confirmDelete"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                Excluir
+            </button>
+            </div>
+        </div>
+        </div>
+    </div>
+    
+
+    <!-- Alerta Central -->
+    <div id="centralAlert" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="bg-red-600 text-white px-6 py-4 rounded-lg shadow-lg max-w-sm w-full text-center">
+            <span id="centralAlertText"></span>
+            <button id="closeAlert" class="ml-4 font-bold">X</button>
+        </div>
+    </div>
+
+  
+    <script src="/js/cursoHomeModal.js"></script>
+    <script src="/js/cursoFiltro.js"></script>
+        
+</body>
+
+</html>

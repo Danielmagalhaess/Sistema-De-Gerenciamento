@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feriados Cadastrados - SGFIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/FeriadoHome.css">
+
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Navegação Lateral -->
+    <nav id="side-nav">
+        <div id="side-nav-container" class="flex flex-col">
+            <div class="flex items-center gap-4 mb-8 ml-2 h-10">
+                <i class="fa-solid fa-layer-group text-3xl text-blue-400"></i>
+                <span class="nav-link-text font-bold text-xl">SGFIC</span>
+            </div>
+            <ul class="flex flex-col gap-2">
+                <li>
+                    <a href="/home" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-house"></i>
+                        <span class="nav-link-text font-semibold">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link bg-gray-700 text-white">
+                        <i class="fa-solid fa-calendar-alt"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Feriados</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/docentes" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Docentes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/usuarios" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-user mr-2"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Usuários</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/cursos" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-book"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Cursos</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- Botão de Logout -->
+        <div class="logout-container">
+            <a href="/logout" class="logout-btn bg-red-900 text-white hover:bg-red-800 w-full">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="nav-link-text font-semibold">Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <i class="fas fa-calendar-check text-blue-600"></i>
+                    Feriados Cadastrados
+                </h1>
+                <p class="text-gray-500 mt-1">Gerencie os feriados e pontos facultativos.</p>
+            </div>
+            <form action="/feriados/create" method="get" class="mt-4 sm:mt-0">
+                <button type="submit"
+                    class="flex items-center justify-center bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300">
+                    <i class="fa-solid fa-plus mr-2"></i>
+                    Cadastrar Feriado
+                </button>
+            </form>
+        </header>
+
+        <!-- Filtro e Busca -->
+        <div class="mb-6">
+            <div class="flex flex-row gap-4 items-center">
+                <div class="relative w-full max-w-md">
+                    <input id="input-busca" type="text" placeholder="Pesquisar feriado..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="w-full max-w-xs">
+                    <select id="select-filtro"
+                        class="w-25 sm:w-auto h-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="todos">Filtrar por Tipo</option>
+                        <option value="nacional">Nacional</option>
+                        <option value="estadual">Estadual</option>
+                        <option value="municipal">Municipal</option>
+                        <option value="facultativo">Ponto Facultativo</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                        <tr class="border-b border-gray-200">
+                            <th class="px-6 py-4 text-left"><i class="fas fa-flag mr-2"></i>Nome do Feriado</th>
+                            <th class="px-6 py-4 text-left relative">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-calendar-day mr-2"></i>
+                                    Data
+                                    <i id="filter-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                        </svg> </i>
+                                </div>
+
+                                <!-- Multi-select de anos -->
+                                <div id="year-filter"
+                                    class="absolute top-0 left-full ml-2 bg-white border border-gray-300 rounded shadow-lg p-2 hidden z-50 max-h-60 overflow-y-auto">
+                                    <!-- opções serão criadas pelo JS -->
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left"><i class="fas fa-calendar-week mr-2"></i>Dia da Semana</th>
+                            <th class="px-6 py-4 text-left"><i class="fas fa-info-circle mr-2"></i>Tipo</th>
+                            <th class="px-6 py-4 text-center"><i class="fas fa-cogs mr-2"></i>Ações</th>
+                            <th class="w-16"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (feriados && feriados.length> 0) { %>
+                            <% feriados.forEach(feriado=> { %>
+                                <% const tipos={ 'nacional' : { badge: 'tipo-nacional' , icon: 'fas fa-globe-americas' ,
+                                    label: 'Nacional' }, 'estadual' : { badge: 'tipo-estadual' , icon: 'fas fa-map' ,
+                                    label: 'Estadual' }, 'municipal' : { badge: 'tipo-municipal' , icon: 'fas fa-city' ,
+                                    label: 'Municipal' }, 'facultativo' : { badge: 'tipo-facultativo' ,
+                                    icon: 'fas fa-user-clock' , label: 'Facultativo' } }; const
+                                    tipoInfo=tipos[feriado.tipo] || { badge: '' , icon: 'fas fa-question' , label:
+                                    feriado.tipo }; // Colocar primeira letra do dia da semana em maiúscula const
+                                    diaSemana=feriado.dia_semana ? feriado.dia_semana.charAt(0).toUpperCase() +
+                                    feriado.dia_semana.slice(1) : '-' ; %>
+                                    <tr class="main-row border-b border-gray-200 cursor-pointer transition-colors bg-white hover:bg-gray-50"
+                                        data-nome="<%= feriado.nome %>" data-tipo="<%= feriado.tipo %>">
+                                        <td class="px-6 py-4 font-medium text-gray-900"><i class="fas fa-flag mr-2"></i>
+                                            <%= feriado.nome || '-' %>
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600"><i class="fas fa-calendar-day mr-2"></i>
+                                            <%= feriado.data_formatada || '-' %>
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600"><i class="fas fa-calendar-week mr-2"></i>
+                                            <%= diaSemana %>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="tipo-badge <%= tipoInfo.badge %>">
+                                                <i class="<%= tipoInfo.icon %>"></i>
+                                                <span>
+                                                    <%= tipoInfo.label %>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center justify-center gap-4">
+                                                <a href="/feriados/edit/<%= feriado.id_feriado %>"
+                                                    class="text-gray-500 hover:text-blue-600 icon-hover" title="Editar"
+                                                    onclick="event.stopPropagation()">
+                                                    <i class="fa-solid fa-pencil"></i>
+                                                </a>
+                                                <button type="button"
+                                                    class="text-gray-500 hover:text-red-600 disabled:text-gray-400 disabled:cursor-not-allowed delete-btn icon-hover"
+                                                    data-id="<%= feriado.id_feriado %>" data-nome="<%= feriado.nome %>">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <i class="fa-solid fa-chevron-down text-gray-500 transition-transform"></i>
+                                        </td>
+                                    </tr>
+                                    <tr class="details-row">
+                                        <td colspan="6" class="p-0">
+                                            <div class="details-container bg-gray-50/80">
+                                                <div class="p-6 grid grid-cols-1 gap-x-6 gap-y-4 text-sm">
+                                                    <div class="detail-item">
+                                                        <h4 class="font-semibold text-gray-500 flex items-center gap-2">
+                                                            <i class="fas fa-comment-alt"></i>Observação
+                                                        </h4>
+                                                        <p class="text-gray-800">
+                                                            <%= feriado.observacao || 'Nenhuma observação.' %>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <tr class="border-t">
+                                                <td colspan="6" class="text-center py-16 text-gray-500">
+                                                    <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
+                                                    <p class="font-medium">Nenhum feriado encontrado</p>
+                                                    <p class="text-sm">Clique em "Cadastrar Feriado" para começar.</p>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                    </tbody>
+                </table>
+                <!-- Controles de Paginação -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span id="pagination-info-text">Mostrando 1-10 de 50 cursos</span>
+                    </div>
+
+                    <div class="pagination-controls">
+                        <button id="prev-btn" class="pagination-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                            Anterior
+                        </button>
+
+                        <div class="page-numbers" id="page-numbers">
+                            <!-- Números das páginas serão inseridos aqui via JavaScript -->
+                        </div>
+
+                        <button id="next-btn" class="pagination-btn">
+                            Próxima
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">Itens por página:</span>
+                        <select id="items-per-page" class="pagination-select">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Deleção -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Confirmar Exclusão</h3>
+                </div>
+                <button type="button" id="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-600 mb-4">
+                    Tem certeza que deseja excluir o feriado <strong id="holidayNameToDelete"></strong>?
+                </p>
+                <p class="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                    <i class="fas fa-warning mr-2"></i>
+                    Esta ação não pode ser desfeita.
+                </p>
+            </div>
+            <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+                <button type="button" id="cancelDelete"
+                    class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-times mr-2"></i>
+                    Cancelar
+                </button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit"
+                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                        <i class="fas fa-trash mr-2"></i>
+                        Excluir Feriado
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/js/ModalFeriados.js"></script>
+    <script src="/js/FeriadoHome.js"></script>
+
+</body>
+
+</html>

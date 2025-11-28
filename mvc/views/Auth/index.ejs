@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENAI - Portal de Acesso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="w-100">
+            <div class="login-card mx-auto">
+                <div class="card-header">
+                    <h2 class="card-title">Entrar</h2>
+                    <p class="card-subtitle">Digite suas credenciais para acessar o sistema</p>
+                </div>
+                
+                <div class="card-body">
+                    <form method="POST" action="/auth">
+                        <div class="mb-3">
+                            <label for="usuario" class="form-label">NIF (Número de Identificação do Funcionário)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Digite seu NIF" required autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="senha" class="form-label">Senha</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input type="password" class="form-control" id="senha" name="senha" placeholder="Digite sua senha" required>
+                                <span class="input-group-text password-toggle" onclick="togglePassword()">
+                                    <i class="bi bi-eye" id="toggleIcon"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <% if (invalido) { %>
+                            <div class="alert alert-warning"><%= invalido %></div>
+                        <% } %>
+                        <% if (usuarioInvalido) { %>
+                            <div class="alert alert-danger"><%= usuarioInvalido %></div>
+                        <% } %>
+                        <% if (senhaInvalida) { %>
+                            <div class="alert alert-danger"><%= senhaInvalida %></div>
+                        <% } %>
+                        <button type="submit" class="btn btn-primary btn-login w-100">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Entrar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById('senha');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+            toggleIcon.classList.toggle('bi-eye');
+            toggleIcon.classList.toggle('bi-eye-slash');
+        }
+    </script>
+</body>
+</html>

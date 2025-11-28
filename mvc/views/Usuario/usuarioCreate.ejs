@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuários - SGFIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-y: auto;
+            padding-left: 72px; /* Espaço para a nav recolhida (um pouco menor ) */
+            transition: padding-left 0.3s ease-in-out;
+        }
+        main {
+            flex-grow: 1; 
+        }
+        /* Transições e Estilos da Navegação Lateral */
+        #side-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 72px; /* Largura recolhida (um pouco menor) */
+            background-color: #111827; /* bg-gray-900 */
+            color: white;
+            overflow: hidden;
+            transition: width 0.3s ease-in-out;
+            z-index: 100;
+        }
+
+        #side-nav:hover {
+            width: 250px; /* Largura expandida (diminuída) */
+        }
+
+        .nav-link-text {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+
+        #side-nav:hover .nav-link-text {
+            opacity: 1;
+            transition-delay: 0.1s;
+        }
+        
+        /* Ajuste no padding e alinhamento dos links */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* 16px */
+            padding: 1rem; /* 12px */
+            border-radius: 0.5rem; /* 8px */
+        }
+
+        .nav-link i {
+            font-size: 1.125rem; /* 18px */
+            text-align: center;
+        }
+
+        /* Ajuste no padding do container da nav */
+        #side-nav-container {
+            padding: 0.6rem; /* 16px */
+        }
+        /* Estilo para o botão de logout fixado no final */
+        .logout-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.6rem;
+            border-top: 1px solid #374151; /* border-gray-700 */
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .logout-btn:hover {
+            background-color: #991b1b; /* red-800 */
+        }
+
+        .logout-btn i {
+            font-size: 1.125rem;
+            text-align: center;
+        }
+
+        /* Estilos para validação de senha */
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .strength-indicator {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak { background-color: #ef4444; }
+        .strength-medium { background-color: #f59e0b; }
+        .strength-strong { background-color: #10b981; }
+
+        .password-requirements {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-bottom: 0.125rem;
+        }
+
+        .requirement.met {
+            color: #10b981;
+        }
+
+        .requirement.unmet {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <!-- Navegação Lateral -->
+    <nav id="side-nav" class="">
+        <div id="side-nav-container" class="flex flex-col">
+            <div class="flex items-center gap-4 mb-8 ml-2 h-10">
+                <i class="fa-solid fa-layer-group text-3xl text-blue-400"></i>
+                <span class="nav-link-text font-bold text-xl">SGFIC</span>
+            </div>
+            <ul class="flex flex-col gap-2">
+                <li>
+                    <a href="/home" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-house"></i>
+                        <span class="nav-link-text font-semibold">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/feriados" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-calendar-alt"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Feriados</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/docentes" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Docentes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/usuarios" class="nav-link bg-gray-700 text-white">
+                        <i class="fas fa-user mr-2"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Usuários</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/cursos" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-book"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Cursos</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+         <!-- Botão de Logout -->
+         <div class="logout-container">
+            <a href="/logout" class="logout-btn bg-red-900 text-white hover:bg-red-800 w-full">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="nav-link-text font-semibold">Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="p-6 sm:p-8 lg:p-10 max-w-4xl mx-auto w-full">
+        <form action="/usuarios/create" method="POST" id="createUserForm" class="flex flex-col h-full">
+            
+            <div class="flex-grow space-y-6">
+                <div class="mb-1">
+                    <h1 class="text-3xl font-bold text-gray-900">Cadastrar Novo Usuário</h1>
+                </div>
+
+                <!-- Seção: Informações do Usuário -->
+                <section>
+                    <h2 class="text-xl font-bold text-gray-900 mb-3 pb-2 border-b">Informações do Usuário</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+                        <!-- NIF -->
+                        <div>
+                            <label for="nif" class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0z" />
+                                </svg>
+                                NIF (Número de Identificação Fiscal)
+                            </label>
+                            <input type="text" id="nif" name="nif" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Ex: 123.456.789-00" maxlength="14" required>
+                        </div>
+
+                        <!-- Cargo -->
+                        <div>
+                            <label for="cargo" class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
+                                </svg>
+                                Cargo/Função
+                            </label>
+                            <select id="cargo" name="cargo" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                                <option value="" disabled selected>Selecione o cargo</option>
+                                <option value="gestao">Gestão</option>
+                                <option value="asa">Assistente</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Seção: Credenciais de Acesso -->
+                <section>
+                    <h2 class="text-xl font-bold text-gray-900 mb-3 pb-2 border-b">Credenciais de Acesso</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+                        <!-- Senha -->
+                        <div>
+                            <label for="senha" class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                                </svg>
+                                Senha
+                            </label>
+                            <div class="relative">
+                                <input type="password" id="senha" name="senha" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10" placeholder="Digite uma senha segura" required>
+                                <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-400 hover:text-gray-600">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Confirmar Senha -->
+                        <div>
+                            <label for="confirmarSenha" class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Confirmar Senha
+                            </label>
+                            <input type="password" id="confirmarSenha" name="confirmar_senha" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Confirme a senha" required>
+                            <div id="passwordMatch" class="mt-1 text-sm"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Botões -->
+            <div class="mt-auto pt-8 flex justify-between items-center flex-shrink-0">
+                <a href="/usuarios" class="text-sm font-medium text-gray-600 hover:text-gray-900 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
+                </a>
+                <button type="submit" id="submitBtn" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-md hover:bg-blue-700 transition-colors shadow-sm disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-user-plus mr-2"></i>
+                    Cadastrar Usuário
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        // Navegação lateral
+        const sideNav = document.getElementById('side-nav');
+        const body = document.body;
+        
+        sideNav.addEventListener('mouseenter', () => { body.style.paddingLeft = '240px'; });
+        sideNav.addEventListener('mouseleave', () => { body.style.paddingLeft = '72px'; });
+
+        // Formatação do NIF
+        document.getElementById('nif').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                e.target.value = value;
+            }
+        });
+
+        // Toggle de visualização da senha
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const senhaInput = document.getElementById('senha');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (senhaInput.type === 'password') {
+                senhaInput.type = 'text';
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 11-4.243-4.243m4.242 4.242L9.88 9.88" />
+                `;
+            } else {
+                senhaInput.type = 'password';
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                `;
+            }
+        });
+
+        // Validação de confirmação de senha
+        function validatePasswordMatch() {
+            const senha = document.getElementById('senha').value;
+            const confirmarSenha = document.getElementById('confirmarSenha').value;
+            const matchDiv = document.getElementById('passwordMatch');
+
+            if (confirmarSenha === '') {
+                matchDiv.textContent = '';
+                return true;
+            }
+
+            if (senha === confirmarSenha) {
+                matchDiv.textContent = '✓ Senhas coincidem';
+                matchDiv.className = 'mt-1 text-sm text-green-600';
+                return true;
+            } else {
+                matchDiv.textContent = '✗ Senhas não coincidem';
+                matchDiv.className = 'mt-1 text-sm text-red-600';
+                return false;
+            }
+        }
+
+        document.getElementById('confirmarSenha').addEventListener('input', validatePasswordMatch);
+        document.getElementById('senha').addEventListener('input', validatePasswordMatch);
+
+        // Validação do formulário
+        document.getElementById('createUserForm').addEventListener('submit', function(e) {
+            const senha = document.getElementById('senha').value;
+            const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+            // Verificar se as senhas coincidem
+            if (senha !== confirmarSenha) {
+                e.preventDefault();
+                alert('As senhas não coincidem. Por favor, verifique e tente novamente.');
+                return;
+            }
+        });
+
+        // Adicionar listeners para todos os campos
+        document.getElementById('nif').addEventListener('input', updateSubmitButton);
+        document.getElementById('cargo').addEventListener('change', updateSubmitButton);
+        document.getElementById('senha').addEventListener('input', updateSubmitButton);
+        document.getElementById('confirmarSenha').addEventListener('input', updateSubmitButton);
+    </script>
+</body>
+</html>

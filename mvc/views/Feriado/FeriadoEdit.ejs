@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Feriado - SGFIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-y: auto;
+            padding-left: 72px; /* Espaço para a nav recolhida (um pouco menor ) */
+            transition: padding-left 0.3s ease-in-out;
+        }
+        main {
+            flex-grow: 1; 
+        }
+        /* Transições e Estilos da Navegação Lateral */
+        #side-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 72px; /* Largura recolhida (um pouco menor) */
+            background-color: #111827; /* bg-gray-900 */
+            color: white;
+            overflow: hidden;
+            transition: width 0.3s ease-in-out;
+            z-index: 100;
+        }
+
+        #side-nav:hover {
+            width: 250px; /* Largura expandida (diminuída) */
+        }
+
+        .nav-link-text {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+
+        #side-nav:hover .nav-link-text {
+            opacity: 1;
+            transition-delay: 0.1s;
+        }
+        
+        /* Ajuste no padding e alinhamento dos links */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* 16px */
+            padding: 1rem; /* 12px */
+            border-radius: 0.5rem; /* 8px */
+        }
+
+        .nav-link i {
+            font-size: 1.125rem; /* 18px */
+            text-align: center;
+        }
+
+        /* Ajuste no padding do container da nav */
+        #side-nav-container {
+            padding: 0.6rem; /* 16px */
+        }
+        /* Estilo para o botão de logout fixado no final */
+        .logout-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.6rem;
+            border-top: 1px solid #374151; /* border-gray-700 */
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .logout-btn:hover {
+            background-color: #991b1b; /* red-800 */
+        }
+
+        .logout-btn i {
+            font-size: 1.125rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+   <!-- Navegação Lateral -->
+   <nav id="side-nav" class="">
+        <div id="side-nav-container" class="flex flex-col">
+            <div class="flex items-center gap-4 mb-8 ml-2 h-10">
+                <i class="fa-solid fa-layer-group text-3xl text-blue-400"></i>
+                <span class="nav-link-text font-bold text-xl">SGFIC</span>
+            </div>
+            <ul class="flex flex-col gap-2">
+                <li>
+                    <a href="/home" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-house"></i>
+                        <span class="nav-link-text font-semibold">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/feriados" class="nav-link bg-gray-700 text-white">
+                        <i class="fa-solid fa-calendar-alt"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Feriados</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/docentes" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Docentes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/usuarios" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-user mr-2"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Usuários</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/cursos" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-book"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Cursos</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+         <!-- Botão de Logout -->
+         <div class="logout-container">
+            <a href="/logout" class="logout-btn bg-red-900 text-white hover:bg-red-800 w-full">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="nav-link-text font-semibold">Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="p-6 sm:p-8 lg:p-10 max-w-6xl mx-auto w-full">
+        <form action="/feriados/edit/<%= feriado.id_feriado %>" method="POST" id="editHolidayForm" class="flex flex-col h-full">
+            
+            <div class="flex-grow space-y-6">
+                <div class="mb-1">
+                    <h1 class="text-3xl font-bold text-gray-900">Editar Feriado</h1>
+                </div>
+
+                <!-- Seção: Informações do Feriado -->
+                <section>
+                    <h2 class="text-xl font-bold text-gray-900 mb-3 pb-2 border-b">Informações do Feriado</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                        <div>
+                            <label for="nomeFeriado" class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                                </svg>
+                                Nome do Feriado
+                            </label>
+                            <input type="text" id="nomeFeriado" name="nome" value="<%= feriado.nome %>" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="dataFeriado" class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18" />
+                                </svg>
+                                Data do Feriado
+                            </label>
+                            <input type="date" id="dataFeriado" name="data_feriado" value="<%= feriado.data_feriado.toISOString().split('T')[0] %>" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="tipoFeriado" class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                </svg>
+                                Tipo de Feriado
+                            </label>
+                            <select id="tipoFeriado" name="tipo" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" required>
+                                <option value="nacional" <%= feriado.tipo === 'nacional' ? 'selected' : '' %>>Nacional</option>
+                                <option value="estadual" <%= feriado.tipo === 'estadual' ? 'selected' : '' %>>Estadual</option>
+                                <option value="municipal" <%= feriado.tipo === 'municipal' ? 'selected' : '' %>>Municipal</option>
+                                <option value="facultativo" <%= feriado.tipo === 'facultativo' ? 'selected' : '' %>>Ponto Facultativo</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Seção: Observações -->
+                <section>
+                  <h2 class="text-xl font-bold text-gray-900 mb-3 pb-2 border-b">Observações</h2>
+                  <div>
+                      <label for="observacoes" class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                          </svg>
+                          Detalhes Adicionais (Opcional)
+                      </label>
+                      <textarea id="observacoes" name="observacao" rows="4" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"><%= feriado.observacao %></textarea>
+                  </div>
+                </section>
+            </div>
+
+            <!-- Botões -->
+            <div class="mt-auto pt-6 flex justify-between items-center flex-shrink-0">
+                <a href="/feriados" class="text-sm font-medium text-gray-600 hover:text-gray-900 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
+                </a>
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-5 rounded-md hover:bg-blue-700 transition-colors shadow-sm">
+                    Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        // Navegação lateral
+        const sideNav = document.getElementById('side-nav');
+        const body = document.body;
+        
+        sideNav.addEventListener('mouseenter', () => { body.style.paddingLeft = '240px'; });
+        sideNav.addEventListener('mouseleave', () => { body.style.paddingLeft = '72px'; });
+    </script>
+</body>
+</html>

@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Curso - SGFIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome apenas para o ícone do header, que é específico -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@latest/dist/driver.js.iife.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@latest/dist/driver.css"/>
+    <link rel="stylesheet" href="/css/Tour.css">
+    <style>
+        /* Estrutura de layout principal */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-y: auto;
+            /* Barra de rolagem no body, no canto direito do navegador */
+            padding-left: 72px;
+            /* Espaço para a nav recolhida (um pouco menor ) */
+            transition: padding-left 0.3s ease-in-out;
+        }
+
+        main {
+            flex-grow: 1;
+        }
+
+        /* Indicador de status */
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-verde {
+            background-color: #22c55e;
+        }
+
+        .status-cinza {
+            background-color: #6b7280;
+        }
+
+        .status-vermelho {
+            background-color: #ef4444;
+        }
+
+        .status-sem-cor {
+            background-color: #fbbf24;
+            border: 2px solid #f59e0b;
+        }
+
+        /* Transições e Estilos da Navegação Lateral */
+        #side-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 72px;
+            /* Largura recolhida (um pouco menor) */
+            background-color: #111827;
+            /* bg-gray-900 */
+            color: white;
+            overflow: hidden;
+            transition: width 0.3s ease-in-out;
+            z-index: 100;
+        }
+
+        #side-nav:hover {
+            width: 250px;
+            /* Largura expandida (diminuída) */
+        }
+
+        .nav-link-text {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+
+        #side-nav:hover .nav-link-text {
+            opacity: 1;
+            transition-delay: 0.1s;
+        }
+
+        /* Ajuste no padding e alinhamento dos links */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            /* 16px */
+            padding: 1rem;
+            /* 12px */
+            border-radius: 0.5rem;
+            /* 8px */
+        }
+
+        .nav-link i {
+            font-size: 1.125rem;
+            /* 18px */
+            text-align: center;
+        }
+
+        /* Ajuste no padding do container da nav */
+        #side-nav-container {
+            padding: 0.6rem;
+            /* 16px */
+        }
+
+        /* Estilo para o botão de logout fixado no final */
+        .logout-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.6rem;
+            border-top: 1px solid #374151;
+            /* border-gray-700 */
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .logout-btn:hover {
+            background-color: #991b1b;
+            /* red-800 */
+        }
+
+        .logout-btn i {
+            font-size: 1.125rem;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+
+    <% const isAssistente=usuario && usuario.cargo==='asa' ; %>
+
+    <!-- Navegação Lateral -->
+    <nav id="side-nav" class="">
+        <div id="side-nav-container" class="flex flex-col">
+            <div class="flex items-center gap-4 mb-8 ml-2 h-10">
+                <i class="fa-solid fa-layer-group text-3xl text-blue-400"></i>
+                <span class="nav-link-text font-bold text-xl">SGFIC</span>
+            </div>
+            <ul class="flex flex-col gap-2">
+                <li>
+                    <a href="/home" class="nav-link bg-gray-700 text-white">
+                        <i class="fa-solid fa-house"></i>
+                        <span class="nav-link-text font-semibold">Home</span>
+                    </a>
+                </li>
+                <% if(!isAssistente) { %>
+                    <li>
+                        <a href="/feriados" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                            <i class="fa-solid fa-calendar-alt"></i>
+                            <span class="nav-link-text font-semibold">Gerenciar Feriados</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/docentes" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span class="nav-link-text font-semibold">Gerenciar Docentes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/usuarios" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                            <i class="fas fa-user mr-2"></i>
+                            <span class="nav-link-text font-semibold">Gerenciar Usuários</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/cursos" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                            <i class="fas fa-book"></i>
+                            <span class="nav-link-text font-semibold">Gerenciar Cursos</span>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+        <!-- Botão de Logout -->
+        <div class="logout-container">
+            <a href="/logout" class="logout-btn bg-red-900 text-white hover:bg-red-800 w-full">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="nav-link-text font-semibold">Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="p-6 sm:p-8 lg:p-10 max-w-6xl mx-auto w-full">
+        <form action="/edit/<%= curso.id_curso %>" method="POST" id="createCourseForm" class="flex flex-col h-full">
+
+            <div class="flex-grow space-y-6">
+                <div class="mb-1" id="editarCurso">
+                    <h1 id="tour-1" class="text-3xl font-bold text-gray-900">Editar Curso</h1>
+                </div>
+
+                <!-- Seção: Informações do Curso -->
+                <section>
+                    <h2 class="text-xl font-bold text-gray-900 mb-3 pb-2 border-b">Informações do Curso</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                        <div>
+                            <label for="nomeCurso"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                                </svg>
+                                Nome do Curso
+                            </label>
+                            <!-- Input do Curso -->
+                            <input list="cursos" id="nomeCurso" name="nomeCurso"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                            value="<%= exibir_nome.nome_curso || '' %>"
+                            placeholder="Selecione ou digite o nome do curso" autocomplete="off" <%= isAssistente ? 'disabled' : '' %>>
+
+                            <!-- Hidden input já preenchido com ID do curso -->
+                            <input type="hidden" id="nomeCursoHidden" name="id_nome_curso"
+                            value="<%= exibir_nome.id_nome_curso || '' %>" <%= isAssistente ? 'disabled' : '' %>>
+
+                            <datalist id="cursos">
+                                <% nomesCursos.forEach(c => { %>
+                                    <option value="<%= c.nome %>" data-id="<%= c.id_nome_curso %>"></option>
+                                <% }); %>
+                            </datalist>
+
+                            <p id="nomeCursoError" class="text-red-500 text-sm hidden"></p>
+                        </div>
+                        <div>
+                            <label for="nivelCurso"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                </svg>
+                                Nível do Curso
+                            </label>
+                            <select id="nivelCurso" name="nivelCurso"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                required <%= isAssistente ? 'disabled' : '' %>>
+                                <option value="" disabled>Selecione o nível</option>
+                                <option value="iniciacao" <%= curso.nivel === 'iniciacao' ? 'selected' : '' %>>Iniciação</option>
+                                <option value="qualificacao" <%= curso.nivel === 'qualificacao' ? 'selected' : '' %>>Qualificação</option>
+                                <option value="especializacao" <%= curso.nivel === 'especializacao' ? 'selected' : '' %>>Especialização</option>
+                                <option value="aperfeicoamento" <%= curso.nivel === 'aperfeicoamento' ? 'selected' : '' %>>Aperfeiçoamento</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="nomeTurma"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                </svg>
+                                Nome SGSET
+                            </label>
+                            <input type="text" id="nomeTurma" name="nomeTurma"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                placeholder="Ex: MPBI" value="<%= turma.nome_sgset %>" <%= isAssistente ? 'disabled' : '' %>>
+                        </div>
+                        <div>
+                            <label for="docente"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-chalkboard-teacher text-gray-600"></i>
+                                Docente Responsável
+                            </label>
+                            <!-- Input do Docente -->
+                            <input list="docentes" id="docenteInput" name="docenteInput"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                            value="<%= turma.nome_docente || '' %>"
+                            placeholder="Selecione o docente responsável" autocomplete="off" <%= isAssistente ? 'disabled' : '' %>> 
+
+                            <!-- Hidden input já preenchido com ID do docente -->
+                            <input type="hidden" id="docenteHidden" name="id_docente"
+                            value="<%= turma.id_docente || '' %>" <%= isAssistente ? 'disabled' : '' %>>
+
+                            <datalist id="docentes">
+                            <% docentes.forEach(d => { %>
+                                <option value="<%= d.nome %>" data-id="<%= d.id_docente %>"></option>
+                            <% }); %>
+                            </datalist>
+
+                            <p id="docenteError" class="text-red-500 text-sm hidden"></p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Seção: Agenda e Local -->
+                <section>
+                    <h2 class="text-xl font-bold text-gray-900 mb-3 pb-2 border-b">Agenda e Local</h2>
+                    <!-- ÚNICA ALTERAÇÃO: A grade agora é md:grid-cols-2 para alinhar com a seção de cima -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                        <div>
+                            <label for="local"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                Local
+                            </label>
+                            <input type="text" id="local" name="local"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                placeholder="Ex: Lab 2" value="<%= turma.local %>" <%= isAssistente ? 'disabled' : '' %>>
+                        </div>
+                        <div>
+                            <label for="turno"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Turno
+                            </label>
+                            <select id="turno" name="turno"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                required <%= isAssistente ? 'disabled' : '' %>>
+                                <option value="" disabled selected>Selecione</option>
+                                <option value="M" <%= turma.turno === 'M' ? 'selected' : '' %>>Manhã</option>
+                                <option value="T" <%= turma.turno === 'T' ? 'selected' : '' %>>Tarde</option>
+                                <option value="N" <%= turma.turno === 'N' ? 'selected' : '' %>>Noite</option>
+                                <option value="I" <%= turma.turno === 'I' ? 'selected' : '' %>>Integral</option>
+                            </select>
+                        </div>
+
+                        <% 
+                        const diasSemana = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+                        const horariosMap = {};
+                        if (horarios && horarios.length > 0) {
+                            horarios.forEach(h => {
+                            horariosMap[h.dia_semana] = {
+                                inicio: h.horario_inicio ? h.horario_inicio.substring(0,5) : "",
+                                fim: h.horario_fim ? h.horario_fim.substring(0,5) : ""
+                            };
+                            });
+                        }
+                        %>
+
+                        <!-- Dias da Semana + Horários -->
+                        <div class="md:col-span-2">
+                            <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18" />
+                                </svg>
+
+                                Dias e Horários da Semana
+                            </label>
+
+                            <div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200">
+                                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left font-medium text-gray-700 w-1/4">Dia</th>
+                                            <th class="px-4 py-3 text-center font-medium text-gray-700">Ativo</th>
+                                            <th class="px-4 py-3 text-center font-medium text-gray-700">Horário Início
+                                            </th>
+                                            <th class="px-4 py-3 text-center font-medium text-gray-700">Horário Fim</th>
+                                        </tr>
+                                    </thead>
+                                    
+                                    <%
+                                    // Cria o mapa de horários uma única vez, sem redeclarar
+                                    if (typeof locals.horariosMap === 'undefined') {
+                                        locals.horariosMap = {};
+
+                                        if (horarios && horarios.length > 0) {
+                                        horarios.forEach(function(h) {
+                                            locals.horariosMap[h.dia_semana] = {
+                                            inicio: h.horario_inicio ? h.horario_inicio.substring(0,5) : "",
+                                            fim: h.horario_fim ? h.horario_fim.substring(0,5) : ""
+                                            };
+                                        });
+                                        }
+                                    }
+                                    %>
+
+                                    <tbody class="overflow-x-auto rounded-xl shadow-sm border border-gray-200">
+
+                                        <!-- Segunda -->
+                                        <tr class="hover:bg-gray-50 transition">
+                                            <td class="px-4 py-2 font-medium text-gray-800">Segunda</td>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="segunda_ativa"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" <%= isAssistente ? 'disabled' : '' %>
+                                                    <%= horariosMap["Segunda"] ? "checked" : "" %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_inicio_segunda"
+                                                    value="<%= horariosMap['Segunda']?.inicio || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_fim_segunda"
+                                                    value="<%= horariosMap['Segunda']?.fim || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Terça -->
+                                        <tr class="hover:bg-gray-50 transition">
+                                            <td class="px-4 py-2 font-medium text-gray-800">Terça</td>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="terca_ativa"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" <%= isAssistente ? 'disabled' : '' %>
+                                                    <%= horariosMap["Terça"] ? "checked" : "" %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_inicio_terca"
+                                                    value="<%= horariosMap['Terça']?.inicio || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>> 
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_fim_terca"
+                                                    value="<%= horariosMap['Terça']?.fim || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Quarta -->
+                                        <tr class="hover:bg-gray-50 transition">
+                                            <td class="px-4 py-2 font-medium text-gray-800">Quarta</td>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="quarta_ativa"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" <%= isAssistente ? 'disabled' : '' %>
+                                                    <%= horariosMap["Quarta"] ? "checked" : "" %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_inicio_quarta"
+                                                    value="<%= horariosMap['Quarta']?.inicio || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_fim_quarta"
+                                                    value="<%= horariosMap['Quarta']?.fim || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Quinta -->
+                                        <tr class="hover:bg-gray-50 transition">
+                                            <td class="px-4 py-2 font-medium text-gray-800">Quinta</td>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="quinta_ativa"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" <%= isAssistente ? 'disabled' : '' %>
+                                                    <%= horariosMap["Quinta"] ? "checked" : "" %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_inicio_quinta"
+                                                    value="<%= horariosMap['Quinta']?.inicio || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>> 
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_fim_quinta"
+                                                    value="<%= horariosMap['Quinta']?.fim || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>> 
+                                            </td>
+                                        </tr>
+
+                                        <!-- Sexta -->
+                                        <tr class="hover:bg-gray-50 transition">
+                                            <td class="px-4 py-2 font-medium text-gray-800">Sexta</td>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="sexta_ativa"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" <%= isAssistente ? 'disabled' : '' %>
+                                                    <%= horariosMap["Sexta"] ? "checked" : "" %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_inicio_sexta"
+                                                    value="<%= horariosMap['Sexta']?.inicio || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_fim_sexta"
+                                                    value="<%= horariosMap['Sexta']?.fim || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Sábado -->
+                                        <tr class="hover:bg-gray-50 transition">
+                                            <td class="px-4 py-2 font-medium text-gray-800">Sábado</td>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="sabado_ativa"
+                                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" <%= isAssistente ? 'disabled' : '' %>
+                                                    <%= horariosMap["Sábado"] ? "checked" : "" %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_inicio_sabado"
+                                                    value="<%= horariosMap['Sábado']?.inicio || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="time" name="horario_fim_sabado"
+                                                    value="<%= horariosMap['Sábado']?.fim || '' %>"
+                                                    class="w-28 border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+
+
+                        <div>
+                            <label for="dataInicio"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18" />
+                                </svg>
+                                Data Início
+                            </label>
+                            <input type="date" id="dataInicio" name="dataInicio" 
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                            value="<%= turma.inicio ? turma.inicio.toISOString().split('T')[0] : '' %>" <%= isAssistente ? 'disabled' : '' %>>
+                        </div>
+                        <div>
+                            <label for="dataTermino"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18" />
+                                </svg>
+                                Data Término
+                            </label>
+                            <input type="date" id="dataTermino" name="dataTermino"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                            value="<%= turma.termino ? turma.termino.toISOString().split('T')[0] : '' %>" readonly disabled>
+                        </div>
+                    </div>
+            </div>
+            </section>
+
+            <br>
+
+            <!-- Seção: Vagas e Capacidade -->
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3 pb-2 border-b">Vagas e Capacidade</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6">
+                    <div>
+                        <label for="cargaHoraria"
+                            class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Carga Horária (h )
+                        </label>
+                        <input type="number" id="cargaHoraria" name="cargaHoraria"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" value="<%= turma.carga_horaria %>"
+                            min="1" placeholder="Ex: 160" <%= isAssistente ? 'disabled' : '' %>>
+                    </div>
+                    <div>
+                        <label for="vagas" class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                            </svg>
+                            Nº de Vagas
+                        </label>
+                        <input type="number" id="vagas" name="vagas"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" value="<%= turma.vagas %>"
+                            min="1" placeholder="Ex: 30">
+                    </div>
+                    <div>
+                        <label for="matriculasRealizadas"
+                            class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Matrículas Realizadas
+                        </label>
+                        <input type="number" id="matriculasRealizadas" name="matriculasRealizadas"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" value="<%= turma.matriculas %>"
+                            min="0" placeholder="Ex: 20">
+                    </div>
+                </div>
+            </section>
+
+            <br>
+
+            <!-- Seção: Pagamento -->
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3 pb-2 border-b">Informações Financeiras</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <input id="cursoPago" name="cursoPago" type="checkbox"
+                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" <%=curso.preco
+                            && curso.preco> 0 ? 'checked' : '' %> <%= isAssistente ? 'disabled' : '' %>>
+                            <label for="cursoPago" class="ml-2 text-sm font-medium text-gray-700">Este curso é
+                                pago</label>
+                    </div>
+                    <div id="camposCursoPago" class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4"
+                        style="display:<%= curso.preco && curso.preco > 0 ? 'grid' : 'none' %>;">
+                        <div>
+                            <label for="valorInteiro"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Valor Inteiro (R$ )
+                            </label>
+                            <input type="text" step="0.01" id="valorInteiro" name="valorInteiro"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                value="<%= curso.preco && curso.preco > 0 ? Number(curso.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '' %>"
+                                <%=isAssistente ? 'disabled' : '' %>>
+                        </div>
+                        <div>
+                            <label for="numeroParcelas"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                Nº de Parcelas
+                            </label>
+                            <input type="number" id="numeroParcelas" name="numeroParcelas"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                value="<%= curso.parcelas_max || '' %>" <%=isAssistente ? 'disabled' : '' %>>
+                        </div>
+                        <div>
+                            <label for="valorMensal"
+                                class="flex items-center gap-2 block text-sm font-medium text-gray-700 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                Valor Mensal (R$ )
+                            </label>
+                            <input type="text" step="0.01" id="valorMensal" name="valorMensal"
+                                class="w-full p-2 border bg-gray-100 border-gray-300 rounded-md" readonly value="<%= curso.preco && curso.preco > 0 && curso.parcelas_max
+                                        ? (curso.preco / curso.parcelas_max).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                        : '' %>">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <br>
+
+            <!-- Seção: Status do Curso -->
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3 pb-2 border-b">Status do Curso</h2>
+                <div class="relative max-w-xs">
+                    <label for="statusCurso" class="sr-only">Status do Curso</label>
+                    <select id="statusCurso" name="statusCurso"
+                        class="w-full p-2 pr-10 border border-gray-300 rounded-md appearance-none focus:ring-2 focus:ring-blue-500" <%= isAssistente ? 'disabled' : '' %>>
+                        <option value="" disabled>Selecione o status atual</option>
+                        <option value="sem-cor" <%= curso.status === 'sem-cor' ? 'selected' : '' %>>Planejada</option>
+                        <option value="verde" <%= curso.status === 'verde' ? 'selected' : '' %>>Iniciou</option>
+                        <option value="cinza" <%= curso.status === 'cinza' ? 'selected' : '' %>>Finalizou</option>
+                        <option value="vermelho" <%= curso.status === 'vermelho' ? 'selected' : '' %>>Cancelada</option>
+                    </select>
+                    <span id="statusVisual"
+                        class="status-indicator pointer-events-none absolute top-1/2 -translate-y-1/2 right-3"></span>
+                </div>
+            </section>
+            </div>
+
+            <!-- Botões de Ação no final do formulário -->
+            <div class="mt-auto pt-6 flex justify-between items-center flex-shrink-0">
+                <a href="/home" id="voltar"
+                    class="text-sm font-medium text-gray-600 hover:text-gray-900 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
+                </a>
+                <button type="submit" id="editar"
+                    class="bg-blue-600 text-white font-semibold py-2 px-5 rounded-md hover:bg-blue-700 transition-colors shadow-sm">
+                    Editar Curso
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('createCourseForm');
+        
+            const campos = [
+                {
+                    input: document.getElementById('nomeCurso'),
+                    datalist: document.getElementById('cursos'),
+                    hidden: document.getElementById('nomeCursoHidden'),
+                    error: document.getElementById('nomeCursoError'),
+                    label: 'curso'
+                },
+                {
+                    input: document.getElementById('docenteInput'),
+                    datalist: document.getElementById('docentes'),
+                    hidden: document.getElementById('docenteHidden'),
+                    error: document.getElementById('docenteError'),
+                    label: 'docente'
+                }
+            ];
+        
+            // Função para validar e preencher hidden
+            function validarCampo(campo) {
+                const valor = campo.input.value.trim();
+                const option = Array.from(campo.datalist.options)
+                                    .find(o => o.value.toLowerCase() === valor.toLowerCase());
+        
+                if (option) {
+                    campo.hidden.value = option.dataset.id;
+                    campo.error.classList.add('hidden');
+                    campo.input.classList.remove('border-red-500');
+                    return true;
+                } else {
+                    campo.hidden.value = '';
+                    campo.error.textContent = `Selecione um ${campo.label} válido da lista.`;
+                    campo.error.classList.remove('hidden');
+                    campo.input.classList.add('border-red-500');
+                    return false;
+                }
+            }
+        
+            // Preenche hidden automaticamente ao carregar a página
+            campos.forEach(validarCampo);
+        
+            // Valida ao perder foco (blur)
+            campos.forEach(campo => {
+                campo.input.addEventListener('blur', () => validarCampo(campo));
+            });
+        
+            // Valida no submit
+            form.addEventListener('submit', e => {
+                let primeiroInvalido = null;
+                let todosValidos = true;
+        
+                campos.forEach(campo => {
+                    const valido = validarCampo(campo);
+                    if (!valido) {
+                        todosValidos = false;
+                        if (!primeiroInvalido) primeiroInvalido = campo.input;
+                    }
+                });
+        
+                if (!todosValidos) {
+                    e.preventDefault();
+                    if (primeiroInvalido) primeiroInvalido.focus();
+                }
+            });
+        });
+        </script>
+        
+                          
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cursoPagoCheckbox = document.getElementById('cursoPago');
+            const camposCursoPagoDiv = document.getElementById('camposCursoPago');
+            const valorInteiroInput = document.getElementById('valorInteiro');
+            const numeroParcelasInput = document.getElementById('numeroParcelas');
+            const valorMensalInput = document.getElementById('valorMensal');
+            const statusCursoSelect = document.getElementById('statusCurso');
+            const statusVisualSpan = document.getElementById('statusVisual');
+
+            // Mostrar ou ocultar campos de pagamento
+            cursoPagoCheckbox.addEventListener('change', function () {
+                camposCursoPagoDiv.style.display = this.checked ? 'grid' : 'none';
+                valorInteiroInput.disabled = !this.checked;
+                numeroParcelasInput.disabled = !this.checked;
+                valorMensalInput.disabled = !this.checked;
+                
+                if (this.checked) {
+                    calcularValorMensal(); // calcula ao mostrar os campos
+                } else {
+                    valorMensalInput.value = ''; // limpa valor mensal se desmarcado
+                }
+            });
+
+            // 🔢 Função auxiliar: converte o texto formatado em número
+            function limparValor(valor) {
+                return parseFloat(valor.replace(/\./g, '').replace(',', '.')) || 0;
+            }
+
+            // 💰 Formata valor SEM o "R$"
+            function formatarValor(valor) {
+                return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                if (cursoPagoCheckbox.checked) {
+                    valorInteiroInput.disabled = false;
+                    numeroParcelasInput.disabled = false;
+                    valorMensalInput.disabled = false;
+                    calcularValorMensal();
+                }
+            });
+
+            // 🧮 Calcula o valor mensal
+            function calcularValorMensal() {
+                const valor = limparValor(valorInteiroInput.value);
+                const parcelas = parseInt(numeroParcelasInput.value) || 1;
+                if (valor > 0 && parcelas > 0) {
+                    const mensal = valor / parcelas;
+                    valorMensalInput.value = formatarValor(mensal);
+                } else {
+                    valorMensalInput.value = '';
+                }
+            }
+
+            // 🎯 Formatação em tempo real no campo Valor Inteiro
+            valorInteiroInput.addEventListener('input', () => {
+                const cursorPos = valorInteiroInput.selectionStart;
+                const valorNumerico = limparValor(valorInteiroInput.value);
+                valorInteiroInput.value = valorNumerico > 0 ? formatarValor(valorNumerico) : '';
+                valorInteiroInput.setSelectionRange(cursorPos, cursorPos);
+                calcularValorMensal();
+            });
+
+            numeroParcelasInput.addEventListener('input', calcularValorMensal);
+
+            // 🟢 Atualiza a cor do status visual
+            function atualizarStatusVisual() {
+                const selectedValue = statusCursoSelect.value;
+                statusVisualSpan.className = 'status-indicator pointer-events-none absolute top-1/2 -translate-y-1/2 right-3';
+                if (selectedValue) {
+                    statusVisualSpan.classList.add('status-' + selectedValue);
+                }
+            }
+
+            statusCursoSelect.addEventListener('change', atualizarStatusVisual);
+            atualizarStatusVisual();
+        });
+
+        // Navegação lateral (mantida)
+        const sideNav = document.getElementById('side-nav');
+        const body = document.body;
+        sideNav.addEventListener('mouseenter', () => { body.style.paddingLeft = '240px'; });
+        sideNav.addEventListener('mouseleave', () => { body.style.paddingLeft = '72px'; });
+    </script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        
+            const diasSemanaMap = {
+                "segunda": 1,
+                "terca": 2,
+                "quarta": 3,
+                "quinta": 4,
+                "sexta": 5,
+                "sabado": 6
+            };
+        
+            const dataInicioInput = document.getElementById("dataInicio");
+            const dataTerminoInput = document.getElementById("dataTermino");
+            const cargaHorariaInput = document.getElementById("cargaHoraria");
+        
+            let feriados = [];
+        
+            async function carregarFeriados(ano) {
+                try {
+                    const res = await fetch(`/api/feriados?ano=${ano}`);
+                    feriados = await res.json();
+                    // Após carregar feriados, recalcular calendário
+                    calcularCalendario();
+                } catch (err) {
+                    console.error("Erro ao buscar feriados:", err);
+                    feriados = [];
+                }
+            }
+        
+            function horasPorDia(dia) {
+                const inicio = document.querySelector(`input[name="horario_inicio_${dia}"]`)?.value;
+                const fim = document.querySelector(`input[name="horario_fim_${dia}"]`)?.value;
+                if (!inicio || !fim) return 0;
+                const diff = moment(fim, "HH:mm").diff(moment(inicio, "HH:mm"), "hours", true);
+                return diff > 0 ? diff : 0;
+            }
+        
+            async function calcularCalendario() {
+                const cargaHoraria = parseFloat(cargaHorariaInput.value);
+                if (!cargaHoraria) return;
+
+                const diasAtivos = Object.keys(diasSemanaMap).filter(dia => {
+                    return document.querySelector(`input[name="${dia}_ativa"]`)?.checked && horasPorDia(dia) > 0;
+                });
+                if (diasAtivos.length === 0) return;
+
+                // Pegar o ano da data de início ou do dia atual
+                const anoAtual = dataInicioInput.value ? moment(dataInicioInput.value).year() : moment().year();
+
+                // Buscar feriados do backend e garantir formato YYYY-MM-DD
+                try {
+                    const res = await fetch(`/api/feriados?ano=${anoAtual}`);
+                    const dados = await res.json();
+                    feriados = dados.map(f => moment(f).format("YYYY-MM-DD"));
+                } catch (err) {
+                    console.error("Erro ao buscar feriados:", err);
+                    feriados = [];
+                }
+
+                // Data inicial
+                let dataAtual = dataInicioInput.value ? moment(dataInicioInput.value) : moment();
+
+                // Avança até o próximo dia ativo que não seja feriado
+                while (!diasAtivos.some(d => diasSemanaMap[d] === dataAtual.day()) ||
+                    feriados.includes(dataAtual.format("YYYY-MM-DD"))) {
+                    dataAtual.add(1, "day");
+                }
+
+                dataInicioInput.value = dataAtual.format("YYYY-MM-DD");
+
+                // Calcular horas por semana e dias necessários
+                const horasPorSemana = diasAtivos.reduce((acc, dia) => acc + horasPorDia(dia), 0);
+                let diasNecessarios = Math.ceil(cargaHoraria / horasPorSemana * diasAtivos.length);
+
+                // Criar calendário ignorando feriados
+                let aulasAlocadas = 0;
+                let calendario = {};
+                let ultimaData = dataAtual.clone();
+
+                while (aulasAlocadas < diasNecessarios) {
+                    const diaSemanaAtual = dataAtual.day();
+
+                    if (diasAtivos.some(d => diasSemanaMap[d] === diaSemanaAtual) &&
+                        !feriados.includes(dataAtual.format("YYYY-MM-DD"))) {
+
+                        calendario[diaSemanaAtual] = calendario[diaSemanaAtual] || [];
+                        calendario[diaSemanaAtual].push({ data: dataAtual.clone() });
+                        aulasAlocadas++;
+                        ultimaData = dataAtual.clone();
+                    }
+
+                    dataAtual.add(1, "day");
+                }
+
+                dataTerminoInput.value = ultimaData.format("YYYY-MM-DD");
+            }
+        
+            // Atualiza automaticamente ao mudar valores
+            cargaHorariaInput.addEventListener("input", calcularCalendario);
+
+            // Recalcula quando os dias ativos ou horários mudarem
+            Object.keys(diasSemanaMap).forEach(dia => {
+                const checkbox = document.querySelector(`input[name="${dia}_ativa"]`);
+                const inicio = document.querySelector(`input[name="horario_inicio_${dia}"]`);
+                const fim = document.querySelector(`input[name="horario_fim_${dia}"]`);
+
+                [checkbox, inicio, fim].forEach(el => {
+                    if (el) el.addEventListener("change", calcularCalendario);
+                });
+            });
+
+            // Recalcula quando o usuário muda a data de início
+            dataInicioInput.addEventListener("change", calcularCalendario);
+        });
+    </script>
+        
+    <% if (showTour) { %>
+        <% if (isAssistente) { %>
+            <script src="/js/AssTourEdit.js"></script>
+        <% } %>
+    <% } %>        
+
+</body>
+
+</html>

@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - SGFIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro/build/vanilla-calendar.min.css">
+    <link rel="stylesheet" href="/css/Home.css">
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro/build/vanilla-calendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@latest/dist/driver.js.iife.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@latest/dist/driver.css"/>
+    <link rel="stylesheet" href="/css/Tour.css">
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <% const isAssistente=usuario && usuario.cargo==='asa' ; %>
+
+        <!-- Navegação Lateral -->
+        <nav id="side-nav" class="">
+            <div id="side-nav-container" class="flex flex-col">
+                <div class="flex items-center gap-4 mb-8 ml-2 h-10">
+                    <i class="fa-solid fa-layer-group text-3xl text-blue-400"></i>
+                    <span class="nav-link-text font-bold text-xl">SGFIC</span>
+                </div>
+                <ul class="flex flex-col gap-2">
+                    <li>
+                        <a href="#" class="nav-link bg-gray-700 text-white">
+                            <i class="fa-solid fa-house"></i>
+                            <span class="nav-link-text font-semibold">Home</span>
+                        </a>
+                    </li>
+                    <% if (!isAssistente) { %>
+                        <li>
+                            <a href="/feriados" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                                <i class="fa-solid fa-calendar-alt"></i>
+                                <span class="nav-link-text font-semibold">Gerenciar Feriados</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/docentes" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span class="nav-link-text font-semibold">Gerenciar Docentes</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/usuarios" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                                <i class="fas fa-user mr-2"></i>
+                                <span class="nav-link-text font-semibold">Gerenciar Usuários</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/cursos" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                                <i class="fas fa-book"></i>
+                                <span class="nav-link-text font-semibold">Gerenciar Cursos</span>
+                            </a>
+                        </li>
+                        <% } %>
+                </ul>
+            </div>
+            <!-- Botão de Logout -->
+            <div class="logout-container">
+                <a href="/logout" class="logout-btn bg-red-900 text-white hover:bg-red-800 w-full">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="nav-link-text font-semibold">Logout</span>
+                </a>
+            </div>
+        </nav>
+
+
+        <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+            <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <div id="tour-1">
+                    <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                        <i class="fas fa-graduation-cap text-blue-600"></i>
+                        Cursos SGFIC
+                    </h1>
+                    <p class="text-gray-500 mt-1">Gerencie os cursos cadastrados na plataforma.</p>
+                </div>
+                <% if (!isAssistente) { %>
+                    <form action="/create" method="get" class="mt-4 sm:mt-0">
+                        <button id="tour-7" type="submit"
+                            class="flex items-center justify-center bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            <%- isAssistente ? 'disabled' : '' %>>
+                            <i class="fa-solid fa-plus mr-2"></i>
+                            Criar Novo Curso
+                        </button>
+                    </form>
+                    <% } %>
+            </header>
+
+            <!-- Filtro e Busca -->
+            <div class="mb-6">
+                <div class="flex flex-row gap-4 items-center">
+                    <div id="tour-3" class="relative w-full max-w-md">
+                        <input id="input-busca" type="text" placeholder="Pesquisar curso..."
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <div id="tour-2" class="w-full max-w-xs">
+                        <select id="select-filtro"
+                            class="w-25 h-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="nome_sgset">Filtrar por Nome SGSET</option>
+                            <option value="docente">Filtrar por Docente</option>
+                            <option value="nivel">Filtrar por Nivel</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Legenda de Status -->
+            <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs text-gray-600">
+                <div class="flex items-center gap-2">
+                    <div class="status-indicator status-planejada"></div>
+                    <span><i class="fas fa-clock mr-1"></i>Planejada</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="status-indicator status-iniciou"></div>
+                    <span><i class="fas fa-play mr-1"></i>Iniciou</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="status-indicator status-finalizou"></div>
+                    <span><i class="fas fa-check mr-1"></i>Finalizou</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="status-indicator status-cancelada"></div>
+                    <span><i class="fas fa-times mr-1"></i>Cancelada</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                            <tr class="border-b border-gray-200">
+                                <th class="px-6 py-4 text-left">
+                                    <i class="fas fa-book mr-2"></i>Nome do Curso
+                                </th>
+                                <th class="px-6 py-4 text-left">
+                                    <i class="fas fa-tag mr-2"></i>Nome SGSET
+                                </th>
+
+                                <th class="px-6 py-4 text-left relative">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-clock text-gray-600"></i>
+                                        <span>Turno</span>
+
+                                        <!-- Botão de filtro -->
+                                        <button id="btnFiltroTurno"
+                                            class="text-gray-500 hover:text-blue-600 transition relative"
+                                            aria-haspopup="true" aria-expanded="false" type="button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.7" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </th>
+
+                                <!-- Dropdown do filtro Turno -->
+                                <div id="dropdownFiltroTurno"
+                                    class="hidden fixed bg-white border border-gray-200 rounded-lg shadow-xl p-4 z-[99999] w-72"
+                                    style="position: fixed;">
+                                    <h4 class="text-sm font-semibold text-gray-700 mb-3 uppercase">Filtrar por turno
+                                    </h4>
+
+                                    <div class="grid grid-cols-1 gap-y-2 text-sm">
+                                        <label class="flex items-center gap-2">
+                                            <input type="checkbox" value="Manhã"
+                                                class="turno-checkbox scale-90 text-blue-600 rounded focus:ring-blue-500">
+                                            <span>Manhã</span>
+                                        </label>
+                                        <label class="flex items-center gap-2">
+                                            <input type="checkbox" value="Tarde"
+                                                class="turno-checkbox scale-90 text-blue-600 rounded focus:ring-blue-500">
+                                            <span>Tarde</span>
+                                        </label>
+                                        <label class="flex items-center gap-2">
+                                            <input type="checkbox" value="Noite"
+                                                class="turno-checkbox scale-90 text-blue-600 rounded focus:ring-blue-500">
+                                            <span>Noite</span>
+                                        </label>
+                                        <label class="flex items-center gap-2">
+                                            <input type="checkbox" value="Integral"
+                                                class="turno-checkbox scale-90 text-blue-600 rounded focus:ring-blue-500">
+                                            <span>Integral</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="mt-4 flex justify-end gap-2">
+                                        <button id="btnLimparTurno"
+                                            class="text-xs px-3 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
+                                            type="button">
+                                            Limpar
+                                        </button>
+                                        <button id="btnAplicarTurno"
+                                            class="text-xs px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+                                            type="button">
+                                            Aplicar
+                                        </button>
+                                    </div>
+                                </div>
+
+
+                                <th class="px-6 py-4 text-left relative">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-calendar-plus text-gray-600"></i>
+                                        <span>Início</span>
+
+                                        <!-- Botão de filtro -->
+                                        <button id="btnFiltro"
+                                            class="text-gray-500 hover:text-blue-600 transition relative">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.7" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </th>
+
+                                <!-- Dropdown fora da tabela -->
+                                <div id="dropdownFiltro"
+                                    class="hidden absolute bg-white border border-gray-200 rounded-lg shadow-2xl p-4 z-[99999] w-72">
+                                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Filtrar por:</h4>
+
+                                    <!-- Alternador entre Ano / Mês -->
+                                    <div class="flex justify-between mb-3">
+                                        <button id="btnAno"
+                                            class="text-xs px-3 py-1 rounded-md bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 transition">
+                                            Ano
+                                        </button>
+                                        <button id="btnMes"
+                                            class="text-xs px-3 py-1 rounded-md bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition">
+                                            Mês
+                                        </button>
+                                    </div>
+
+                                    <!-- Área de filtros -->
+                                    <div class="transition-all">
+                                        <!-- Filtro de Ano -->
+                                        <div id="filtroAno" class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                            <label class="flex items-center gap-1">
+                                                <input select type="checkbox" value="2025"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>2025</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="2026"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>2026</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="2027"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>2027</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="2028"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>2028</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="2029"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>2029</span>
+                                            </label>
+                                        </div>
+
+                                        <!-- Filtro de Mês -->
+                                        <div id="filtroMes" class="hidden grid grid-cols-3 gap-x-3 gap-y-2 text-sm">
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="01"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Jan</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="02"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Fev</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="03"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Mar</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="04"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Abr</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="05"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Mai</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="06"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Jun</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="07"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Jul</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="08"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Ago</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="09"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Set</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="10"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Out</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="11"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Nov</span>
+                                            </label>
+                                            <label class="flex items-center gap-1">
+                                                <input type="checkbox" value="12"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500">
+                                                <span>Dez</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Botões -->
+                                    <div class="mt-4 flex justify-end gap-2">
+                                        <button id="btnLimpar"
+                                            class="text-xs px-3 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+                                            Limpar
+                                        </button>
+                                        <button id="btnAplicar"
+                                            class="text-xs px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+                                            Aplicar
+                                        </button>
+                                    </div>
+                                </div>
+
+
+
+                                <th class="px-6 py-4 text-left relative">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-calendar-check text-gray-600"></i>
+                                        <span>Fim</span>
+
+                                        <!-- Botão de filtro -->
+                                        <button id="btnFiltroFim"
+                                            class="text-gray-500 hover:text-blue-600 transition relative">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.7" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </th>
+
+                                <!-- Dropdown Filtro Fim -->
+                                <div id="dropdownFiltroFim"
+                                    class="hidden absolute bg-white border border-gray-200 rounded-lg shadow-2xl p-4 z-[99999] w-72">
+                                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Filtrar por:</h4>
+
+                                    <div class="flex justify-between mb-3">
+                                        <button id="btnAnoFim"
+                                            class="text-xs px-3 py-1 rounded-md bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 transition">
+                                            Ano
+                                        </button>
+                                        <button id="btnMesFim"
+                                            class="text-xs px-3 py-1 rounded-md bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition">
+                                            Mês
+                                        </button>
+                                    </div>
+
+                                    <!-- Filtros -->
+                                    <div class="transition-all">
+                                        <!-- Filtro Ano -->
+                                        <div id="filtroAnoFim" class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="2025"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>2025</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="2026"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>2026</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="2027"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>2027</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="2028"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>2028</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="2029"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>2029</span></label>
+                                        </div>
+
+                                        <!-- Filtro Mês -->
+                                        <div id="filtroMesFim" class="hidden grid grid-cols-3 gap-x-3 gap-y-2 text-sm">
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="01"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Jan</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="02"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Fev</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="03"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Mar</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="04"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Abr</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="05"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Mai</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="06"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Jun</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="07"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Jul</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="08"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Ago</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="09"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Set</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="10"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Out</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="11"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Nov</span></label>
+                                            <label class="flex items-center gap-1"><input type="checkbox" value="12"
+                                                    class="scale-75 text-blue-600 rounded focus:ring-blue-500"><span>Dez</span></label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Botões -->
+                                    <div class="mt-4 flex justify-end gap-2">
+                                        <button id="btnLimparFim"
+                                            class="text-xs px-3 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+                                            Limpar
+                                        </button>
+                                        <button id="btnAplicarFim"
+                                            class="text-xs px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+                                            Aplicar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Botão de filtro -->
+                                <th class="px-6 py-4 text-left relative overflow-visible">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-percentage text-gray-600"></i>
+                                        <span>Ocupação de Vagas</span>
+
+                                        <button id="btnFiltroOcupacao"
+                                            class="text-gray-500 hover:text-blue-600 transition relative">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.7" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                            </svg>
+                                        </button>
+
+                                        <div id="dropdownFiltroOcupacao" class="hidden fixed bg-white border border-gray-200 rounded-lg shadow-2xl p-4
+                                        w-72 z-[2147483647]">
+
+
+                                            <h4 class="text-sm font-semibold text-gray-700 mb-3">
+                                                Filtrar por Porcentagem de vagas (%)
+                                            </h4>
+
+
+                                            <div class="flex flex-col items-center mb-4">
+                                                <span class="text-sm text-gray-600 mb-1">
+                                                    <span id="ocupacaoValor">0</span>%
+                                                </span>
+
+                                                <input id="ocupacaoRange" type="range" min="0" max="100" value="0"
+                                                    step="1"
+                                                    class="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 accent-blue-500">
+                                            </div>
+
+                                            <div class="flex justify-between">
+
+                                                <!-- LIMPAR (agora à esquerda) -->
+                                                <button id="btnLimparOcupacao"
+                                                    class="bg-gray-100 text-gray-500 px-4 py-2 rounded hover:bg-gray-400 transition">
+                                                    Limpar
+                                                </button>
+
+                                                <!-- APLICAR (agora à direita) -->
+                                                <button id="btnAplicarOcupacao"
+                                                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                                                    Aplicar
+                                                </button>
+                                            </div>
+                                        </div>
+                                </th>
+
+
+                                <th class="px-6 py-4 text-left relative">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-info-circle text-gray-600"></i>
+                                        <span>Status</span>
+
+                                        <!-- Botão de filtro -->
+                                        <button id="btnFiltroStatus"
+                                            class="text-gray-500 hover:text-blue-600 transition relative">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.7" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </th>
+
+                                <!-- Dropdown do filtro STATUS -->
+                                <div id="dropdownFiltroStatus"
+                                    class="hidden fixed bg-white border border-gray-200 rounded-lg shadow-2xl p-4 z-[99999] w-64">
+                                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Filtrar por Status</h4>
+
+                                    <!-- Lista de status -->
+                                    <div class="flex flex-col gap-2 text-sm">
+                                        <label class="flex items-center gap-2">
+                                            <input type="checkbox" value="Planejada"
+                                                class="scale-90 text-blue-600 rounded focus:ring-blue-500">
+                                            <span class="flex items-center gap-2">
+                                                <span class="w-3 h-3 bg-yellow-400 rounded-full"></span> Planejada
+                                            </span>
+                                        </label>
+                                        <label class="flex items-center gap-2">
+                                            <input type="checkbox" value="Iniciou"
+                                                class="scale-90 text-blue-600 rounded focus:ring-blue-500">
+                                            <span class="flex items-center gap-2">
+                                                <span class="w-3 h-3 bg-green-500 rounded-full"></span> Iniciou
+                                            </span>
+                                        </label>
+                                        <label class="flex items-center gap-2">
+                                            <input type="checkbox" value="Finalizada"
+                                                class="scale-90 text-blue-600 rounded focus:ring-blue-500">
+                                            <span class="flex items-center gap-2">
+                                                <span class="w-3 h-3 bg-gray-400 rounded-full"></span> Finalizada
+                                            </span>
+                                        </label>
+                                        <label class="flex items-center gap-2">
+                                            <input type="checkbox" value="Cancelada"
+                                                class="scale-90 text-blue-600 rounded focus:ring-blue-500">
+                                            <span class="flex items-center gap-2">
+                                                <span class="w-3 h-3 bg-red-500 rounded-full"></span> Cancelada
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Botões -->
+                                    <div class="mt-4 flex justify-end gap-2">
+                                        <button id="btnLimparStatus"
+                                            class="text-xs px-3 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+                                            Limpar
+                                        </button>
+                                        <button id="btnAplicarStatus"
+                                            class="text-xs px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+                                            Aplicar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Recomendo: nas suas linhas da tabela, defina a célula de status assim: <td data-column="status">Finalizada</td>-->
+
+
+
+
+                                <th class="px-6 py-4 text-center">
+                                    <i class="fas fa-cogs mr-2"></i>Ações
+                                </th>
+                                <th class="w-16"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <% if (cursos && cursos.length> 0) { %>
+                                <% cursos.forEach(curso=> { %>
+                                    <% const precoNum=Number(curso.preco) || 0; const
+                                        parcelasNum=parseInt(curso.parcelas_max) || 0; const mensal=parcelasNum> 0 ?
+                                        (precoNum / parcelasNum) : 0;
+                                        function formatBR(valor) {
+                                        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                                        }
+
+                                        const formatarDataBR = (dataString) => {
+                                        if (!dataString || dataString === '-') return '-';
+                                        try {
+                                        // dataString vem como "YYYY-MM-DD"
+                                        const [ano, mes, dia] = dataString.split('-');
+                                        // mês no Date é 0-indexado
+                                        return `${dia}/${mes}/${ano}`;
+                                        } catch (e) {
+                                        return '-';
+                                        }
+                                        };
+
+                                        // Mapeamento de status para classes e labels
+                                        const statusInfo = {
+                                        'verde': { class: 'iniciou', label: 'Iniciou', indicator: 'status-iniciou' },
+                                        'cinza': { class: 'finalizou', label: 'Finalizou', indicator: 'status-finalizou'
+                                        },
+                                        'vermelho': { class: 'cancelada', label: 'Cancelada', indicator:
+                                        'status-cancelada' },
+                                        'sem-cor': { class: 'planejada', label: 'Planejada', indicator:
+                                        'status-planejada' }
+                                        };
+                                        const status = statusInfo[curso.statusCurso] || statusInfo['sem-cor'];
+
+                                        // Cálculo da barra de progresso
+                                        const matriculas = parseInt(curso.matriculas) || 0;
+                                        const vagas = parseInt(curso.vagas) || 1;
+                                        const ocupacao = Math.round((matriculas / vagas) * 100);
+                                        let progressClass = 'low';
+                                        if (ocupacao >= 80) progressClass = 'high';
+                                        else if (ocupacao >= 50) progressClass = 'medium';
+
+                                        // Totais
+                                        const cargaHoraria = Number(curso.cargaHoraria) || "-";
+                                        const totalEsperado = precoNum * vagas;
+                                        const totalReal = precoNum * matriculas;
+                                        const turmaHoraEstimado = (precoNum * vagas) / cargaHoraria;
+                                        const turmaHoraReal = (precoNum * matriculas) / cargaHoraria;
+
+                                        %>
+                                        <input type="hidden" name="turma_id_<%= curso.id_turma %>" value="<%= curso.id_turma %>">
+                                        <tr class="main-row border-b border-gray-200 cursor-pointer transition-colors bg-white hover:bg-gray-50"
+                                            data-nome_sgset="<%= curso.nome_sgset %>"
+                                            data-docente="<%= curso.docente %>" data-nivel="<%= curso.nivel %>">
+                                            <td class="px-6 py-4 font-medium text-gray-900">
+                                                <i class="fas fa-book mr-2"></i>
+                                                <%= curso.nome || '-' %>
+                                            </td>
+                                            <td class="px-6 py-4 text-gray-600">
+                                                <i class="fas fa-tag mr-2"></i>
+                                                <%= curso.nome_sgset || '-' %>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <% if (curso.turno && curso.turno !=='-' ) { const turnos={ 'm' : {
+                                                    badge: 'turno-manha' , icon: 'fas fa-sun' }, 't' : {
+                                                    badge: 'turno-tarde' , icon: 'fas fa-cloud-sun' }, 'n' : {
+                                                    badge: 'turno-noite' , icon: 'fas fa-moon' }, 'i' : {
+                                                    badge: 'turno-integral' , icon: 'fas fa-clock' }, }; const
+                                                    turnoKey=(curso.turno || '' ).toLowerCase(); const
+                                                    turnoData=turnos[turnoKey] || { badge: 'turno-default' ,
+                                                    icon: 'fas fa-question' }; // Exibição bonita do nome (opcional)
+                                                    const nomesTurno={ m: 'Manhã' , t: 'Tarde' , n: 'Noite' ,
+                                                    i: 'Integral' }; const turnoLabel=nomesTurno[turnoKey] ||
+                                                    curso.turno; %>
+                                                    <div class="turno-badge <%= turnoData.badge %>">
+                                                        <i class="<%= turnoData.icon %>"></i>
+                                                        <%= turnoLabel %>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <span class="text-gray-600">-</span>
+                                                        <% } %>
+                                            </td>
+                                            <td class="px-6 py-4 text-gray-600">
+                                                <i class="fas fa-play-circle text-green-500 mr-2"></i>
+                                                <%= formatarDataBR(curso.dataInicio) %>
+                                            </td>
+                                            <td class="px-6 py-4 text-gray-600">
+                                                <i class="fas fa-stop-circle text-red-500 mr-2"></i>
+                                                <%= formatarDataBR(curso.dataTermino) %>
+                                            </td>
+                                            <td class="px-6 py-4" data-ocupacao="<%= ocupacao %>">
+
+                                                <% if (curso.matriculas !==undefined && curso.vagas !==undefined) { %>
+                                                    <div class="flex flex-col gap-2">
+                                                        <div class="flex justify-between text-xs text-gray-600">
+                                                            <span>
+                                                                <%= matriculas %>/<%= vagas %>
+                                                            </span>
+                                                            <span>
+                                                                <%= ocupacao %>%
+                                                            </span>
+                                                        </div>
+                                                        <div class="progress-bar">
+                                                            <div class="progress-fill <%= progressClass %>"
+                                                                style="width: <%= ocupacao %>%"></div>
+                                                        </div>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <span class="text-gray-600">-</span>
+                                                        <% } %>
+
+                                            </td>
+
+                                            <td class="px-6 py-4 text-center">
+                                                <div class="status-badge <%= status.class %>">
+                                                    <div class="status-indicator <%= status.indicator %>"></div>
+                                                    <%= status.label %>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-center justify-center gap-4">
+                                                    <a id="tour-5" href="/edit/<%= curso.id %>"
+                                                        class="text-gray-500 hover:text-blue-600 icon-hover"
+                                                        title="Editar" onclick="event.stopPropagation()">
+                                                        <i class="fa-solid fa-pencil"></i>
+                                                    </a>
+                                                    <% if (!isAssistente) { %>
+                                                        <button id="tour-6" type="button"
+                                                            class="text-gray-500 hover:text-red-600 disabled:text-gray-400 disabled:cursor-not-allowed delete-btn icon-hover"
+                                                            data-id="<%= curso.id %>" data-nome="<%= curso.nome %>">
+                                                            <i class="fa-solid fa-trash-can"></i>
+                                                        </button>
+                                                        <% } %>
+                                                        <a id="abrirModalBtn" href="javascript:void(0);"
+                                                            class="text-gray-500 hover:text-blue-600"
+                                                            title="Calendário"
+                                                            onclick="gerarCalendario(this)"
+                                                            data-data_inicio="<%= curso.dataInicio %>"
+                                                            data-carga_horaria="<%= curso.cargaHoraria %>"
+                                                            data-dias_semana='<%= JSON.stringify(curso.diasArray) %>'
+                                                            data-turma_id='<%= curso.id_turma %>'>
+                                                            <i class="fa-solid fa-calendar"></i>
+                                                        </a>
+
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-center">
+                                                <i
+                                                    class="fa-solid fa-chevron-down text-gray-500 transition-transform"></i>
+                                            </td>
+                                        </tr>
+                                        <tr class="details-row">
+                                            <td colspan="9" class="p-0">
+                                                <div class="details-container bg-gray-50/80">
+                                                    <div
+                                                        class="p-6 grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 text-sm">
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-layer-group"></i>Nível
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                                <%= curso.nivel || '-' %>
+                                                            </p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-chalkboard-teacher"></i>Docente
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                                <%= curso.docente || '-' %>
+                                                            </p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-map-marker-alt"></i>Local
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                                <%= curso.local || '-' %>
+                                                            </p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-clock"></i>Carga Horária
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                                <%= curso.cargaHoraria ? curso.cargaHoraria + 'h' : '-'
+                                                                    %>
+                                                            </p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-calendar-week"></i>Horários das Aulas
+                                                            </h4>
+                                                            <p class="text-gray-800"><%- curso.dias || '-' %></p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-dollar-sign"></i>Valor
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                                <% if (precoNum> 0) { %>
+                                                                    <%= formatBR(precoNum) %>
+                                                                        <% if (parcelasNum> 0) { %>
+                                                                            <br><small class="text-gray-500">
+                                                                                <%= parcelasNum %>x de <%=
+                                                                                        formatBR(mensal) %>
+                                                                            </small>
+                                                                            <% } %>
+                                                                                <% } else { %>
+                                                                                    Gratuito
+                                                                                    <% } %>
+                                                            </p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-info-circle"></i>Status Detalhado
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                            <div class="status-badge <%= status.class %>">
+                                                                <div class="status-indicator <%= status.indicator %>">
+                                                                </div>
+                                                                <%= status.label %>
+                                                            </div>
+                                                            </p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-dollar-sign"></i>Total Esperado
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                                <%= formatBR(totalEsperado) %>
+                                                            </p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-dollar-sign"></i>Total Real
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                                <%= formatBR(totalReal) %>
+                                                            </p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-dollar-sign"></i>Turma Hora Estimado
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                                <%= formatBR(turmaHoraEstimado) %>
+                                                            </p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <h4
+                                                                class="font-semibold text-gray-500 flex items-center gap-2">
+                                                                <i class="fas fa-dollar-sign"></i>Turma Hora Real
+                                                            </h4>
+                                                            <p class="text-gray-800">
+                                                                <%= formatBR(turmaHoraReal) %>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                            <% } else { %>
+                                                <tr class="border-t">
+                                                    <td colspan="9" class="text-center py-16 text-gray-500">
+                                                        <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
+                                                        <p class="font-medium">Nenhum curso encontrado</p>
+                                                        <p class="text-sm">Clique em "Criar Novo Curso" para começar.
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                        </tbody>
+                    </table>
+                    <!-- Controles de Paginação -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            <span id="pagination-info-text"></span>
+                        </div>
+
+                        <div class="pagination-controls">
+                            <button id="prev-btn" class="pagination-btn" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                                Anterior
+                            </button>
+
+                            <div class="page-numbers" id="page-numbers">
+                                <!-- Números das páginas serão inseridos aqui via JavaScript -->
+                            </div>
+
+                            <button id="next-btn" class="pagination-btn">
+                                Próxima
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="tour-4" class="flex items-center gap-2">
+                            <span class="text-sm text-gray-600">Itens por página:</span>
+                            <select id="items-per-page" class="pagination-select">
+                                <option value="5" selected>5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmação de Deleção -->
+        <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                <!-- Header do Modal -->
+                <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900">Confirmar Exclusão</h3>
+                    </div>
+                    <button type="button" id="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Corpo do Modal -->
+                <div class="p-6">
+                    <p class="text-gray-600 mb-4">
+                        Tem certeza que deseja excluir o curso <strong id="courseNameToDelete"></strong>?
+                    </p>
+                    <p class="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                        <i class="fas fa-warning mr-2"></i>
+                        Esta ação não pode ser desfeita. Todos os dados relacionados ao curso serão permanentemente
+                        removidos.
+                    </p>
+                </div>
+
+                <!-- Footer do Modal -->
+                <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+                    <button type="button" id="cancelDelete"
+                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancelar
+                    </button>
+                    <form id="deleteForm" method="POST" style="display: inline;">
+                        <button type="submit"
+                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>
+                            Excluir Curso
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="meuModal" class="fixed inset-0 bg-black bg-opacity-50   flex justify-end hidden">
+            <div class="bg-white w-1/2 h-full p-6 shadow-lg relative overflow-y-auto">
+                <button id="fecharModal"
+                    class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                <h2 class="text-xl font-bold mb-4">Calendário do Curso</h2>
+                <div id="calendar" class="w-full"></div>
+            </div>
+        </div>
+
+
+
+        <script>
+            const modal = document.getElementById("meuModal");
+            const btnFechar = document.getElementById("fecharModal");
+            let calendarInstance; // instância global
+            
+            btnFechar.addEventListener("click", () => modal.classList.add("hidden"));
+            modal.addEventListener("click", e => { 
+                if (e.target === modal) modal.classList.add("hidden"); 
+            });
+            
+            async function gerarCalendario(elemento) {
+                modal.classList.remove("hidden");
+            
+                const data_inicio = elemento.dataset.data_inicio;
+                const carga_horaria = parseInt(elemento.dataset.carga_horaria, 10);
+                const turma_id = elemento.dataset.turma_id;
+            
+                // Converte a string JSON para array
+                let dias = [];
+                try {
+                    dias = JSON.parse(elemento.dataset.dias_semana); // agora é array de strings
+                } catch (err) {
+                    console.error("Erro ao ler dias da semana:", err, elemento.dataset.dias_semana);
+                    return;
+                }
+
+                const dias_semana = dias.map(d => {
+                    if (d === "Domingo") return 0;
+                    if (d === "Segunda") return 1;
+                    if (d === "Terça") return 2;
+                    if (d === "Quarta") return 3;
+                    if (d === "Quinta") return 4;
+                    if (d === "Sexta") return 5;
+                    if (d === "Sábado") return 6;
+                }).filter(v => v !== undefined);
+
+                if (dias_semana.length === 0) {
+                    console.error("Nenhum dia válido selecionado.");
+                    return;
+                }
+
+            
+                try {
+                    const response = await fetch("http://localhost:3000/calendar", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            data_inicio,
+                            carga_horaria,
+                            dias_semana,
+                            turma_id
+                        })
+                    });
+            
+                    if (!response.ok) {
+                        const err = await response.json();
+                        console.error("Erro do servidor:", err);
+                        return;
+                    }
+            
+                    const data = await response.json();
+            
+                    const datasAulas = [];
+                    Object.values(data.calendar).forEach(lista => {
+                        lista.forEach(aula => datasAulas.push(aula.data));
+                    });
+            
+                    const feriados = data.feriados;
+
+                    if (calendarInstance) calendarInstance.destroy();
+            
+                    calendarInstance = new VanillaCalendar("#calendar", {
+                        type: "multiple",
+                        months: 6,
+                        settings: {
+                            lang: "pt",
+                            selection: { day: "multiple" }
+                        }
+                    });
+            
+                    calendarInstance.settings.selected.holidays = feriados;
+                    calendarInstance.settings.selected.dates = datasAulas;
+                    calendarInstance.init();
+            
+                } catch(err) {
+                    console.error("Erro ao gerar calendário:", err);
+                }
+            }
+        </script>
+            
+                  
+
+        <script src="/js/filtroTurnoHome.js"></script>
+        <script src="/js/filtroinicioHome.js"></script>
+        <script src="/js/filtroFimHome.js"></script>
+        <script src="/js/filtroRangeHome.js"></script>
+        <script src="/js/filtroStatusHome.js"></script>
+        <script src="/js/filtroModalHome.js"></script>
+        <% if (showTour) { %>
+            <% if (!isAssistente) { %>
+                <script src="/js/TourHome.js"></script>
+            <% } else { %>
+                <script src="/js/AssTourHome.js"></script>
+            <% } %>
+        <% } %>        
+        
+</body>
+</html>

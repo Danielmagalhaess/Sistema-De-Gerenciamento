@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários Cadastrados - SGFIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/usuarioHome.css">
+
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Navegação Lateral -->
+    <nav id="side-nav">
+        <div id="side-nav-container" class="flex flex-col">
+            <div class="flex items-center gap-4 mb-8 ml-2 h-10">
+                <i class="fa-solid fa-layer-group text-3xl text-blue-400"></i>
+                <span class="nav-link-text font-bold text-xl">SGFIC</span>
+            </div>
+            <ul class="flex flex-col gap-2">
+                <li>
+                    <a href="/home" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-house"></i>
+                        <span class="nav-link-text font-semibold">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/feriados" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-calendar-alt"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Feriados</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/docentes" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Docentes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link bg-gray-700 text-white">
+                        <i class="fas fa-user"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Usuários</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/cursos" class="nav-link hover:bg-gray-700 text-gray-300 hover:text-white">
+                        <i class="fas fa-book"></i>
+                        <span class="nav-link-text font-semibold">Gerenciar Cursos</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+         <!-- Botão de Logout -->
+         <div class="logout-container">
+            <a href="/logout" class="logout-btn bg-red-900 text-white hover:bg-red-800 w-full">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="nav-link-text font-semibold">Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <i class="fas fa-users text-blue-600"></i>
+                    Usuários Cadastrados
+                </h1>
+                <p class="text-gray-500 mt-1">Gerencie os usuários do sistema.</p>
+            </div>
+            <form action="/usuarios/create" method="get" class="mt-4 sm:mt-0">
+                <button type="submit" class="flex items-center justify-center bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300">
+                    <i class="fa-solid fa-plus mr-2"></i>
+                    Cadastrar Usuário
+                </button>
+            </form>
+        </header>
+
+        <!-- Filtro e Busca -->
+        <div class="mb-6">
+            <div class="flex flex-row gap-4 items-center">
+                <div class="relative w-full max-w-md">
+                    <input id="input-busca" type="text" placeholder="Pesquisar por NIF..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="w-full max-w-xs">
+                    <select id="select-filtro" class="w-25 sm:w-auto h-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="todos">Filtrar por Cargo</option>
+                        <option value="gestao">Gestão</option>
+                        <option value="asa">Assistente</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                        <tr class="border-b border-gray-200">
+                            <th class="px-6 py-4 text-left"><i class="fas fa-id-card mr-2"></i>NIF</th>
+                            <th class="px-6 py-4 text-left"><i class="fas fa-clock mr-2"></i>Último Acesso</th>
+                            <th class="px-6 py-4 text-left"><i class="fas fa-briefcase mr-2"></i>Cargo</th>
+                            <th class="px-6 py-4 text-center"><i class="fas fa-cogs mr-2"></i>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <% if (usuarios && usuarios.length > 0) { %>
+                            <% usuarios.forEach(usuario => { %>
+                                <%
+                                    const cargos = {
+                                        'gestao': { badge: 'cargo-gestao', icon: 'fas fa-user-shield', label: 'Gestão' },
+                                        'asa': { badge: 'cargo-assistente', icon: 'fas fa-user-tie', label: 'Assistente' }
+                                    };
+                                    const cargoInfo = cargos[usuario.cargo] || { badge: '', icon: 'fas fa-question', label: usuario.cargo };
+                                %>
+                                <tr class="main-row border-b border-gray-200 transition-colors bg-white hover:bg-gray-50"
+                                data-nif="<%= usuario.nif %>"
+                                data-cargo="<%= usuario.cargo %>">
+                                    <td class="px-6 py-4 font-medium text-gray-900">
+                                        <i class="fas fa-id-card mr-2"></i><%= usuario.nif || '-' %>
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-600">
+                                        <i class="fas fa-clock mr-2"></i><%= usuario.ultimo_acesso ? new Date(usuario.ultimo_acesso).toLocaleDateString('pt-BR') : 'Nunca acessou' %>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="cargo-badge <%= cargoInfo.badge %>">
+                                            <i class="<%= cargoInfo.icon %>"></i>
+                                            <span><%= cargoInfo.label %></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center justify-center gap-4">
+                                            <a href="/usuarios/edit/<%= usuario.id_usuario %>" class="text-gray-500 hover:text-blue-600 icon-hover" title="Editar">
+                                                <i class="fa-solid fa-pencil"></i>
+                                            </a>
+                                            <button type="button"
+                                                class="text-gray-500 hover:text-red-600 delete-btn icon-hover"
+                                                data-id="<%= usuario.id_usuario %>"
+                                                data-nif="<%= usuario.nif %>">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr class="border-t">
+                                <td colspan="4" class="text-center py-16 text-gray-500">
+                                    <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
+                                    <p class="font-medium">Nenhum usuário encontrado</p>
+                                    <p class="text-sm">Clique em "Cadastrar Usuário" para começar.</p>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    <span id="pagination-info-text">Mostrando 1-10 de 50 usuários</span>
+                </div>
+                
+                <div class="pagination-controls">
+                    <button id="prev-btn" class="pagination-btn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                        Anterior
+                    </button>
+                    
+                    <div class="page-numbers" id="page-numbers">
+                        <!-- Números das páginas serão inseridos aqui via JavaScript -->
+                    </div>
+                    
+                    <button id="next-btn" class="pagination-btn">
+                        Próxima
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-600">Itens por página:</span>
+                    <select id="items-per-page" class="pagination-select">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">Confirmar Exclusão</h3>
+            </div>
+            <p class="text-gray-600 mb-2">Tem certeza que deseja excluir o usuário com NIF:</p>
+            <p class="font-semibold text-gray-900 mb-4" id="usuario-nif"></p>
+            <p class="text-sm text-gray-500 mb-6">Esta ação não pode ser desfeita.</p>
+            <div class="flex gap-3 justify-end">
+                <button id="cancel-delete" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancelar
+                </button>
+                <form id="delete-form" method="POST" class="inline">
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script src="/js/usuarioHome.js"></script>
+    
+</body>
+</html>
