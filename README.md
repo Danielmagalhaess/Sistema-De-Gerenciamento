@@ -6,7 +6,7 @@ O **Sistema de Gerenciamento de Cursos** é uma aplicação web robusta e modula
 
 A plataforma disponibiliza informações essenciais para o acompanhamento, como manual de utilização, nome dos cursos, datas de início e término, horários das aulas, status de ocupação das vagas e o progresso do planejamento de cada curso.
 
-O calendário marca azul como dia que terá aula e em amarelo os feriados
+O calendário marca em azul como dia que terá aula e em amarelo os feriados
 
 A aplicação foi projetada para ser intuitiva, contando com o auxílio do **Driver.js** para guiar novos usuários através de um tutorial interativo sobre como utilizar o sistema.
 
